@@ -93,7 +93,6 @@ class MultiAgentEnv(gym.Env):
             obs_n.append(self._get_obs(agent))
             reward_n.append(self._get_reward(agent))
             done_n.append(self._get_done(agent))
-
             info_n['n'].append(self._get_info(agent))
 
         # all agents get total reward in cooperative case
@@ -171,11 +170,16 @@ class MultiAgentEnv(gym.Env):
                     action[0][:] = 0.0
                     action[0][d] = 1.0
                 if self.discrete_action_space:
+                    # print('agent.action.u = ', agent.action.u)
+                    # print('action = ', action)
+                    # print('action[0] = ', action[0])
+                    # print('action[0][1] = ', action[0][1])
                     agent.action.u[0] += action[0][1] - action[0][2]
                     agent.action.u[1] += action[0][3] - action[0][4]
+                    # print('you are moving left', action[0][1] == 1)
                 else:
                     agent.action.u = action[0]
-            sensitivity = 5.0
+            sensitivity = 1.0
             if agent.accel is not None:
                 sensitivity = agent.accel
             agent.action.u *= sensitivity

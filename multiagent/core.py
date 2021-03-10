@@ -136,6 +136,7 @@ class World(object):
         for i,agent in enumerate(self.agents):
             if agent.movable:
                 noise = np.random.randn(*agent.action.u.shape) * agent.u_noise if agent.u_noise else 0.0
+                # print(agent.action.u)
                 p_force[i] = agent.action.u + noise                
         return p_force
 
@@ -222,3 +223,14 @@ class Roboworld(World):
         super(Roboworld, self).__init__()
         # define arm length of robots
         self.arm_length = 10
+
+    def step(self):
+        for agent in self.agents:
+            self.update_agent_state(agent)
+
+    def update_agent_state(self, agent):
+        # print('State = ', agent.state.pos)
+        # print('Action = ', agent.action.u)
+        # print('length of pos vector', len(agent.state.pos))
+        for i in range(len(agent.state.pos)):
+            agent.state.pos[i] += agent.action.u[i]
