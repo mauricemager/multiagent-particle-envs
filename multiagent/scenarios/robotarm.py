@@ -1,6 +1,7 @@
 import numpy as np
 import math
-from multiagent.core import Roboworld, World, Agent, Landmark, Roboworld
+from multiagent.robot import Robot, Roboworld
+from multiagent.core import Landmark
 from multiagent.scenario import BaseScenario
 
 class Scenario(BaseScenario):
@@ -9,7 +10,7 @@ class Scenario(BaseScenario):
         num_agents = 1
         num_landmarks = 1
         # add agents
-        world.agents = [Agent() for i in range(num_agents)]
+        world.agents = [Robot() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
             agent.collide = False
@@ -28,7 +29,7 @@ class Scenario(BaseScenario):
         # properties for multiple agents evenly spaced on a circle
         radius_agent = 0.5
         angle = 2*math.pi / len(world.agents)
-        num_joints = 2
+        num_joints = 1
         resolution = 8
         # random properties for agents
         for i, agent in enumerate(world.agents):

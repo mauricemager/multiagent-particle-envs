@@ -232,21 +232,12 @@ class MultiAgentEnv(gym.Env):
             self.render_geoms = []
             self.render_geoms_xform = []
             for entity in self.world.entities:
-                # geom = rendering.make_circle(entity.size)
                 xform = rendering.Transform()
                 if 'agent' in entity.name:
+                    print('i do not do this once')
                     geom = rendering.make_arm(entity.state.pos, entity.state.lengths, entity.state.res)
                     geom.set_color(*entity.color, alpha=0.5)
                     geom.set_linewidth(5)
-                # if 'agent' in entity.name:
-                #     # geom = rendering.make_line(entity.state.angles, entity.state.lengths)
-                #     # print(type(entity.state.angles))
-                #     # print(len(entity.state.angles))
-                #     # geom = rendering.make_multiple_lines(entity.state.angles, entity.state.lengths)
-                #     # geom = rendering.make_arm(entity.state.length, entity.state.width)
-                #     print('resolution =', entity.state.res, 'and state = ', entity.state.pos)
-                #     geom = rendering.make_arm(entity.state.pos, entity.state.lengths, entity.state.res)
-                #     geom.set_color(*entity.color, alpha=.5)
                 else:
                     geom = rendering.make_circle(entity.size)
                     geom.set_color(*entity.color)
@@ -272,7 +263,13 @@ class MultiAgentEnv(gym.Env):
             self.viewers[i].set_bounds(pos[0]-cam_range,pos[0]+cam_range,pos[1]-cam_range,pos[1]+cam_range)
             # update geometry positions
             for e, entity in enumerate(self.world.entities):
+                if 'agent' in entity.name:
+
+                    # print('this is entity.state.pos', *entity.state.pos, 'and: ', entity.state.pos)
+                        self.render_geoms_xform[e].set_rotation(*entity.state.pos)
+                # print('entity.sate.pos = ', entity.state.pos)
                 self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
+                # self.render_geoms_xform[e].set_rotation(*entity.state.pos)
             # render to display or array
             results.append(self.viewers[i].render(return_rgb_array = mode=='rgb_array'))
 
