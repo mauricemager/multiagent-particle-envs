@@ -349,7 +349,7 @@ def make_arm(pos, lengths, res):
         joint_coordinates = [math.cos(2 * math.pi/ res * pos[i]) * lengths[i],
                              math.sin(2 * math.pi/ res * pos[i]) * lengths[i]]
         points.append([sum(x) for x in zip(points[i], joint_coordinates)])
-    print('the points of this position are:', points)
+    # print('the points of this position are:', points)
     return PolyLine(points, False)
 
 class RobotTransform(Transform):

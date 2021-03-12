@@ -171,13 +171,8 @@ class MultiAgentEnv(gym.Env):
                     action[0][:] = 0.0
                     action[0][d] = 1.0
                 if self.discrete_action_space:
-                    # print('agent.action.u = ', agent.action.u)
-                    # print('action = ', action)
-                    # print('action[0] = ', action[0])
-                    # print('action[0][1] = ', action[0][1])
                     agent.action.u[0] += action[0][1] - action[0][2]
                     agent.action.u[1] += action[0][3] - action[0][4]
-                    # print('you are moving left', action[0][1] == 1)
                 else:
                     agent.action.u = action[0]
             sensitivity = 1.0
@@ -233,14 +228,12 @@ class MultiAgentEnv(gym.Env):
             self.render_geoms = []
             self.render_geoms_xform = []
             for entity in self.world.entities:
+                xform = rendering.Transform()
                 if 'agent' in entity.name:
-                    xform = rendering.RobotTransform(entity.state.res)
-                    geom = rendering.make_arm(entity.state.pos, entity.state.lengths, entity.state.res)
-                    print(type(geom))
+                    geom = rendering.make_polyline(self.create_robot_points(entity))
                     geom.set_color(*entity.color, alpha=0.5)
                     geom.set_linewidth(5)
                 else:
-                    xform = rendering.Transform()
                     geom = rendering.make_circle(entity.size)
                     geom.set_color(*entity.color)
                 geom.add_attr(xform)
@@ -253,6 +246,7 @@ class MultiAgentEnv(gym.Env):
                 for geom in self.render_geoms:
                     viewer.add_geom(geom)
 
+
         results = []
         for i in range(len(self.viewers)):
             from multiagent import rendering
@@ -264,17 +258,21 @@ class MultiAgentEnv(gym.Env):
                 pos = self.agents[i].state.p_pos
             self.viewers[i].set_bounds(pos[0]-cam_range,pos[0]+cam_range,pos[1]-cam_range,pos[1]+cam_range)
             # update geometry positions
+            self.render_geoms = []
+
             for e, entity in enumerate(self.world.entities):
                 if 'agent' in entity.name:
-                    # print('this is entity.state.pos', *entity.state.pos, 'and: ', entity.state.pos)
-                    self.render_geoms_xform[e].set_rotation(entity.state.pos)
-                    print(self.render_geoms_xform[e].set_rotation(entity.state.pos))
-                    # for i in range(len(entity.state.pos)):
-                        # print('this is *entity.state.pos', entity.state.pos[i], 'and: ', entity.state.pos[i])
-                        # self.render_geoms_xform[e].set_rotation(entity.state.pos[0])
-                # print('entity.sate.pos = ', entity.state.pos)
+                    geom = rendering.make_polyline(self.create_robot_points(entity))
+                    geom.set_color(*entity.color, alpha=0.5)
+                    geom.set_linewidth(5)
+                    self.render_geoms.append(geom)
+
+            for viewer in self.viewers:
+                viewer.geoms = []
+                for geom in self.render_geoms:
+                    viewer.add_geom(geom)
+
                 self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
-                # self.render_geoms_xform[e].set_rotation(*entity.state.pos)
             # render to display or array
             results.append(self.viewers[i].render(return_rgb_array = mode=='rgb_array'))
 
@@ -299,6 +297,19 @@ class MultiAgentEnv(gym.Env):
                 for y in np.linspace(-range_max, +range_max, 5):
                     dx.append(np.array([x,y]))
         return dx
+
+    def create_robot_points(self, robot):
+        points = [[0, 0]]
+        lengths = robot.state.lengths
+        # cumulate state for defining relative joint positions
+        cum_state = robot.state.pos.cumsum()
+        # resolution dependent step for rendering
+        step = 2 * math.pi / robot.state.res
+        for i in range(len(cum_state)):
+            joint_coordinates = [math.cos(step * cum_state[i]) * lengths[i],
+                                 math.sin(step * cum_state[i]) * lengths[i]]
+            points.append([sum(x) for x in zip(points[i], joint_coordinates)])
+        return points
 
 
 # vectorized wrapper for a batch of multi-agent environments

@@ -7,7 +7,7 @@ from multiagent.scenario import BaseScenario
 class Scenario(BaseScenario):
     def make_world(self):
         world = Roboworld()
-        num_agents = 1
+        num_agents = 2
         num_landmarks = 1
         # add agents
         world.agents = [Robot() for i in range(num_agents)]
@@ -29,12 +29,12 @@ class Scenario(BaseScenario):
         # properties for multiple agents evenly spaced on a circle
         radius_agent = 0.5
         angle = 2*math.pi / len(world.agents)
-        num_joints = 1
+        num_joints = 2
         resolution = 180
         # random properties for agents
         for i, agent in enumerate(world.agents):
             agent.color = np.array([0.25,0.25,0.25])
-            agent.state.lengths = 0.25*np.ones(num_joints)
+            agent.state.lengths = 0.25 * np.ones(num_joints)
         # random properties for landmarks
         for i, landmark in enumerate(world.landmarks):
             landmark.color = np.array([0.75,0.75,0.75])
@@ -42,7 +42,7 @@ class Scenario(BaseScenario):
         # set random initial states
         for i, agent in enumerate(world.agents):
             agent.state.pos = np.random.randint(resolution, size=num_joints)
-            print(agent.state.pos)
+            print('The state positions are: ', agent.state.pos)
             # agent.state.angles = np.random.uniform(0,2 * math.pi, num_joints)
             # agent.state.angles = np.zeros(num_joints)
             agent.state.res = resolution
