@@ -1,8 +1,9 @@
-import gym
+import gym, math
 from gym import spaces
 from gym.envs.registration import EnvSpec
 import numpy as np
 from multiagent.multi_discrete import MultiDiscrete
+
 
 # environment for all agents in the multiagent world
 # currently code assumes that no agents will be created/destroyed at runtime!
@@ -232,13 +233,14 @@ class MultiAgentEnv(gym.Env):
             self.render_geoms = []
             self.render_geoms_xform = []
             for entity in self.world.entities:
-                xform = rendering.Transform()
                 if 'agent' in entity.name:
-                    print('i do not do this once')
+                    xform = rendering.RobotTransform(entity.state.res)
                     geom = rendering.make_arm(entity.state.pos, entity.state.lengths, entity.state.res)
+                    print(type(geom))
                     geom.set_color(*entity.color, alpha=0.5)
                     geom.set_linewidth(5)
                 else:
+                    xform = rendering.Transform()
                     geom = rendering.make_circle(entity.size)
                     geom.set_color(*entity.color)
                 geom.add_attr(xform)
@@ -264,9 +266,12 @@ class MultiAgentEnv(gym.Env):
             # update geometry positions
             for e, entity in enumerate(self.world.entities):
                 if 'agent' in entity.name:
-
                     # print('this is entity.state.pos', *entity.state.pos, 'and: ', entity.state.pos)
-                        self.render_geoms_xform[e].set_rotation(*entity.state.pos)
+                    self.render_geoms_xform[e].set_rotation(entity.state.pos)
+                    print(self.render_geoms_xform[e].set_rotation(entity.state.pos))
+                    # for i in range(len(entity.state.pos)):
+                        # print('this is *entity.state.pos', entity.state.pos[i], 'and: ', entity.state.pos[i])
+                        # self.render_geoms_xform[e].set_rotation(entity.state.pos[0])
                 # print('entity.sate.pos = ', entity.state.pos)
                 self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
                 # self.render_geoms_xform[e].set_rotation(*entity.state.pos)

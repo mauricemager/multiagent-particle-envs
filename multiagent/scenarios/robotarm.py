@@ -30,7 +30,7 @@ class Scenario(BaseScenario):
         radius_agent = 0.5
         angle = 2*math.pi / len(world.agents)
         num_joints = 1
-        resolution = 8
+        resolution = 180
         # random properties for agents
         for i, agent in enumerate(world.agents):
             agent.color = np.array([0.25,0.25,0.25])

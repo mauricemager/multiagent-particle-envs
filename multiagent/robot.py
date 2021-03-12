@@ -33,11 +33,11 @@ class Roboworld(World):
             self.update_agent_state(agent)
 
     def update_agent_state(self, agent):
-        print('State = ', agent.state.pos)
-        print('Action = ', agent.action.u)
+        # print('State = ', agent.state.pos)
+        # print('Action = ', agent.action.u)
         # print('length of pos vector', len(agent.state.pos))
         for i in range(len(agent.state.pos)):
             agent.state.pos[i] += agent.action.u[i]
             # make sure state stays within resolution
             agent.state.pos[i] %= agent.state.res
-            print(agent.state.pos[i])
+            # print(agent.state.pos[i])

@@ -22,6 +22,7 @@ import math
 import numpy as np
 
 RAD2DEG = 57.29577951308232
+DEGRES = 360 / 8
 
 def get_display(spec):
     """Convert a display specification (such as :0) into an actual Display
@@ -343,9 +344,23 @@ class SimpleImageViewer(object):
 
 def make_arm(pos, lengths, res):
     points = [[0, 0]]
+    print('testt')
     for i in range(len(pos)):
         joint_coordinates = [math.cos(2 * math.pi/ res * pos[i]) * lengths[i],
                              math.sin(2 * math.pi/ res * pos[i]) * lengths[i]]
         points.append([sum(x) for x in zip(points[i], joint_coordinates)])
+    print('the points of this position are:', points)
     return PolyLine(points, False)
 
+class RobotTransform(Transform):
+    def __init__(self, resolution):
+        super(RobotTransform, self).__init__()
+        # define resolution step in degrees
+        self.res_step = 360 / resolution
+    def enable(self):
+        glPushMatrix()
+        glTranslatef(self.translation[0], self.translation[1], 0) # translate to GL loc ppint
+        glRotatef(self.res_step * self.rotation, 0, 0, 1.0)
+        glScalef(self.scale[0], self.scale[1], 1)
+    def set_rotation(self, new):
+        self.rotation = float(new)
