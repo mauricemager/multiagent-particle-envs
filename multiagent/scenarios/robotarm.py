@@ -13,14 +13,14 @@ class Scenario(BaseScenario):
         world.agents = [Robot() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
             agent.name = 'agent %d' % i
-            agent.collide = False
+            agent.collide = True
             agent.silent = True
         # add landmarks
         world.landmarks = [Landmark() for i in range(num_landmarks)]
         for i, landmark in enumerate(world.landmarks):
             landmark.name = 'landmark %d' % i
-            landmark.collide = False
-            landmark.movable = False
+            landmark.collide = True
+            landmark.movable = True
         # make initial conditions
         self.reset_world(world)
         return world
@@ -42,9 +42,6 @@ class Scenario(BaseScenario):
         # set random initial states
         for i, agent in enumerate(world.agents):
             agent.state.pos = np.random.randint(resolution, size=num_joints)
-            print('The state positions are: ', agent.state.pos)
-            # agent.state.angles = np.random.uniform(0,2 * math.pi, num_joints)
-            # agent.state.angles = np.zeros(num_joints)
             agent.state.res = resolution
             agent.state.p_pos = np.array([radius_agent * math.cos(angle * i),
                                           radius_agent * math.sin(angle * i)])

@@ -261,10 +261,16 @@ class MultiAgentEnv(gym.Env):
             self.render_geoms = []
 
             for e, entity in enumerate(self.world.entities):
+
+                self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
                 if 'agent' in entity.name:
                     geom = rendering.make_polyline(self.create_robot_points(entity))
                     geom.set_color(*entity.color, alpha=0.5)
                     geom.set_linewidth(5)
+                    self.render_geoms.append(geom)
+                else:
+                    geom = rendering.make_circle(0.025)
+                    geom.set_color(*entity.color)
                     self.render_geoms.append(geom)
 
             for viewer in self.viewers:
@@ -272,7 +278,7 @@ class MultiAgentEnv(gym.Env):
                 for geom in self.render_geoms:
                     viewer.add_geom(geom)
 
-                self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
+                # self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
             # render to display or array
             results.append(self.viewers[i].render(return_rgb_array = mode=='rgb_array'))
 
@@ -299,7 +305,7 @@ class MultiAgentEnv(gym.Env):
         return dx
 
     def create_robot_points(self, robot):
-        points = [[0, 0]]
+        points = [robot.state.p_pos]
         lengths = robot.state.lengths
         # cumulate state for defining relative joint positions
         cum_state = robot.state.pos.cumsum()

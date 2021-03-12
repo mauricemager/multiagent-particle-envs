@@ -1,5 +1,3 @@
-
-# ======================= Maurice =======================
 from multiagent.core import AgentState, Agent, World
 
 class RobotState(AgentState):
@@ -11,6 +9,8 @@ class RobotState(AgentState):
         self.lengths = []
         # resolution
         self.res = None
+        # robot is grasping something
+        self.grasp = False
 
         # # width of robot arm
         # self.width = None

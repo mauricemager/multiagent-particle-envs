@@ -5,6 +5,7 @@ sys.path.insert(1, os.path.join(sys.path[0], '..'))
 import argparse
 
 from multiagent.robot_environment import MultiAgentEnv
+from multiagent.robot_policy import RobotInteractivePolicy
 from multiagent.policy import InteractivePolicy
 import multiagent.scenarios as scenarios
 
