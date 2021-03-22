@@ -43,7 +43,7 @@ class MultiAgentEnv(gym.Env):
             total_action_space = []
             # physical action space
             if self.discrete_action_space:
-                u_action_space = spaces.Discrete(world.dim_p * 2 + 1)
+                u_action_space = spaces.Discrete(world.dim_p * 2 + 1) # changed to + 2
             else:
                 u_action_space = spaces.Box(low=-agent.u_range, high=+agent.u_range, shape=(world.dim_p,), dtype=np.float32)
             if agent.movable:
@@ -173,6 +173,7 @@ class MultiAgentEnv(gym.Env):
                 if self.discrete_action_space:
                     agent.action.u[0] += action[0][1] - action[0][2]
                     agent.action.u[1] += action[0][3] - action[0][4]
+                    agent.state.grasp = action[0][5] == 1.0
                 else:
                     agent.action.u = action[0]
             sensitivity = 1.0
@@ -210,7 +211,6 @@ class MultiAgentEnv(gym.Env):
                     else:
                         word = alphabet[np.argmax(other.state.c)]
                     message += (other.name + ' to ' + agent.name + ': ' + word + '   ')
-            print(message)
 
         for i in range(len(self.viewers)):
             # create viewers (if necessary)
@@ -219,32 +219,6 @@ class MultiAgentEnv(gym.Env):
                 #from gym.envs.classic_control import rendering
                 from multiagent import rendering
                 self.viewers[i] = rendering.Viewer(700,700)
-
-        # create rendering geometry
-        if self.render_geoms is None:
-            # import rendering only if we need it (and don't import for headless machines)
-            #from gym.envs.classic_control import rendering
-            from multiagent import rendering
-            self.render_geoms = []
-            self.render_geoms_xform = []
-            for entity in self.world.entities:
-                xform = rendering.Transform()
-                if 'agent' in entity.name:
-                    geom = rendering.make_polyline(self.create_robot_points(entity))
-                    geom.set_color(*entity.color, alpha=0.5)
-                    geom.set_linewidth(5)
-                else:
-                    geom = rendering.make_circle(entity.size)
-                    geom.set_color(*entity.color)
-                geom.add_attr(xform)
-                self.render_geoms.append(geom)
-                self.render_geoms_xform.append(xform)
-
-            # add geoms to viewer
-            for viewer in self.viewers:
-                viewer.geoms = []
-                for geom in self.render_geoms:
-                    viewer.add_geom(geom)
 
 
         results = []
@@ -259,18 +233,19 @@ class MultiAgentEnv(gym.Env):
             self.viewers[i].set_bounds(pos[0]-cam_range,pos[0]+cam_range,pos[1]-cam_range,pos[1]+cam_range)
             # update geometry positions
             self.render_geoms = []
-
             for e, entity in enumerate(self.world.entities):
-
-                self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
+                # self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
                 if 'agent' in entity.name:
-                    geom = rendering.make_polyline(self.create_robot_points(entity))
+                    geom = rendering.make_polyline(entity.create_robot_points())
                     geom.set_color(*entity.color, alpha=0.5)
                     geom.set_linewidth(5)
                     self.render_geoms.append(geom)
-                else:
-                    geom = rendering.make_circle(0.025)
+                elif 'object' in entity.name:
+                    geom = rendering.make_polygon(self.create_object_points(entity))
                     geom.set_color(*entity.color)
+                    self.render_geoms.append(geom)
+                else:
+                    geom = rendering.make_polygon(self.create_goal_points(entity))
                     self.render_geoms.append(geom)
 
             for viewer in self.viewers:
@@ -304,18 +279,25 @@ class MultiAgentEnv(gym.Env):
                     dx.append(np.array([x,y]))
         return dx
 
-    def create_robot_points(self, robot):
-        points = [robot.state.p_pos]
-        lengths = robot.state.lengths
-        # cumulate state for defining relative joint positions
-        cum_state = robot.state.pos.cumsum()
-        # resolution dependent step for rendering
-        step = 2 * math.pi / robot.state.res
-        for i in range(len(cum_state)):
-            joint_coordinates = [math.cos(step * cum_state[i]) * lengths[i],
-                                 math.sin(step * cum_state[i]) * lengths[i]]
-            points.append([sum(x) for x in zip(points[i], joint_coordinates)])
-        return points
+
+    def create_object_points(self, entity):
+        pos = entity.state.p_pos
+        size = 0.025
+        points = size * np.array([[-1, 1], [1, 1], [1, -1], [-1, -1]]) + pos
+        return points.tolist()
+
+    def create_goal_points(self, entity):
+        pos = entity.state.p_pos
+        size = 0.015
+        points = size * np.array([[-2, -1], [0, 2.5], [2, -1]]) + pos
+        return points.tolist()
+
+    # def test_object_graspable(self, agent_index):
+    #     return False
+
+
+
+
 
 
 # vectorized wrapper for a batch of multi-agent environments

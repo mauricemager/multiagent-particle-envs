@@ -15,7 +15,7 @@ class InteractivePolicy(Policy):
         super(InteractivePolicy, self).__init__()
         self.env = env
         # hard-coded keyboard events
-        self.move = [False for i in range(4)]
+        self.move = [False for i in range(5)]
         self.comm = [False for i in range(env.world.dim_c)]
         # register keyboard events with this environment's window
         env.viewers[0].window.on_key_press = self.key_press

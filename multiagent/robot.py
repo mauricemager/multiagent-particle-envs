@@ -1,4 +1,6 @@
 from multiagent.core import AgentState, Agent, World
+import math
+import numpy as np
 
 class RobotState(AgentState):
     def __init__(self):
@@ -15,12 +17,37 @@ class RobotState(AgentState):
         # # width of robot arm
         # self.width = None
 
-
 class Robot(Agent):
     def __init__(self):
         super(Robot, self).__init__()
         # robot state
         self.state = RobotState()
+
+    def create_robot_points(self):
+        # returns a vector of the joint locations of a multiple joint robot arm
+        points = [self.state.p_pos]
+        lengths = self.state.lengths
+        # cumulate state for defining relative joint positions
+        cum_state = self.state.pos.cumsum()
+        # resolution dependent step for rendering
+        step = 2 * math.pi / self.state.res
+        for i in range(len(cum_state)):
+            joint_coordinates = [math.cos(step * cum_state[i]) * lengths[i],
+                                 math.sin(step * cum_state[i]) * lengths[i]]
+            points.append([sum(x) for x in zip(points[i], joint_coordinates)])
+        return points
+
+    def position_end_effector(self):
+        # give the position of the end effector
+        return self.create_robot_points()[-1]
+
+    def test_object_graspable(self, object):
+        # test whether and object is within grasping range for a robot
+        grasp_range = 0.05
+        end_pos = self.position_end_effector()
+        obj_pos = object.state.p_pos
+        dist = np.linalg.norm(obj_pos - end_pos)
+        return dist <= grasp_range
 
 class Roboworld(World):
     def __init__(self):
@@ -33,8 +60,8 @@ class Roboworld(World):
             self.update_agent_state(agent)
 
     def update_agent_state(self, agent):
-        print('State = ', agent.state.pos)
-        print('Action = ', agent.action.u)
+        # print('State = ', agent.state.pos)
+        # print('Action = ', agent.action.u)
         # print('length of pos vector', len(agent.state.pos))
         for i in range(2):
             agent.state.pos[i] += agent.action.u[i]

@@ -1,14 +1,14 @@
 import numpy as np
 import math
 from multiagent.robot import Robot, Roboworld
-from multiagent.core import Landmark
+from multiagent.core import Landmark, Entity
 from multiagent.scenario import BaseScenario
 
 class Scenario(BaseScenario):
     def make_world(self):
         world = Roboworld()
         num_agents = 2
-        num_landmarks = 1
+        num_landmarks = 2
         # add agents
         world.agents = [Robot() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
@@ -17,11 +17,22 @@ class Scenario(BaseScenario):
             agent.silent = True
         # add landmarks
         world.landmarks = [Landmark() for i in range(num_landmarks)]
-        for i, landmark in enumerate(world.landmarks):
-            landmark.name = 'landmark %d' % i
-            landmark.collide = True
-            landmark.movable = True
+        # for i, landmark in enumerate(world.landmarks):
+        #     landmark.name = 'landmark %d' % i
+        #     landmark.collide = True
+        #     landmark.movable = True
+        world.landmarks[0].name = 'object'
+        world.landmarks[0].collide = True
+        world.landmarks[0].movable = True
+        world.landmarks[1].name = 'goal'
+        world.landmarks[0].collide = False
+        world.landmarks[0].movable = False
+
+        # world.dim_p =
+
+
         # make initial conditions
+        # world.goal = Entity()
         self.reset_world(world)
         return world
 
@@ -47,12 +58,23 @@ class Scenario(BaseScenario):
                                           radius_agent * math.sin(angle * i)])
             agent.state.p_vel = np.zeros(world.dim_p)
             agent.state.c = np.zeros(world.dim_c)
-        for i, landmark in enumerate(world.landmarks):
-            landmark.state.p_pos = np.array([0,0])
-            landmark.state.p_vel = np.zeros(world.dim_p)
+        # for i, landmark in enumerate(world.landmarks):
+        #     landmark.state.p_pos = np.array([-0.25,0.2])
+        #     # landmark.state.p_pos = 0.3 * np.random.randn(world.dim_p)
+        #     print('Position of object at: ', landmark.state.p_pos)
+        #     landmark.state.p_vel = np.zeros(world.dim_p)
+        # object entity
+        # world.landmarks[0].state.p_pos = np.array([-0.25,0.2])
+        world.landmarks[0].state.p_pos = 0.3 * np.random.randn(world.dim_p) - [0.5, 0]
+        world.landmarks[0].state.p_vel = np.zeros(world.dim_p)
+        # goal entity
+        world.landmarks[1].state.p_pos = - world.landmarks[0].state.p_pos
+        world.landmarks[1].state.p_vel = np.zeros(world.dim_p)
+
 
     def reward(self, agent, world):
-        dist2 = np.sum(np.square(agent.state.p_pos - world.landmarks[0].state.p_pos))
+        dist2 = np.sum(np.square(world.landmarks[0].state.p_pos - world.landmarks[1].state.p_pos))
+        # dist2 = np.sum(np.square(agent.state.p_pos - world.landmarks[0].state.p_pos))
         return -dist2
 
     def observation(self, agent, world):
