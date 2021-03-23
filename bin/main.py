@@ -38,17 +38,17 @@ if __name__ == '__main__':
         for i, policy in enumerate(policies):
             act_n.append(policy.action(obs_n[i]))
         # step environment
-        print("act_n", act_n)
+        # print("act_n", act_n)
         obs_n, reward_n, done_n, _ = env.step(act_n)
         # render all agent views
         env.render()
         # display rewards
         # for agent in env.world.agents:
         #    print(agent.name + " reward: %0.3f" % env._get_reward(agent))
-        print('End effector position test: ', world.agents[1].position_end_effector())
-
-        print('You can grab to object: ', world.agents[1].test_object_graspable(world.landmarks[0]))
-
-        print('Agent is grabbing:', world.agents[1].state.grasp)
-
-        print('Position')
+        # print('End effector position test: ', world.agents[1].position_end_effector())
+        #
+        # print('You can grab to object: ', world.agents[1].within_reach(world.landmarks[0]))
+        #
+        # print('Agent is grabbing:', world.agents[1].state.grasp)
+        # print(re)
+        # print('Position')

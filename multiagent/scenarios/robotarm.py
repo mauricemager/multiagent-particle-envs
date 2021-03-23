@@ -9,6 +9,7 @@ class Scenario(BaseScenario):
         world = Roboworld()
         num_agents = 2
         num_landmarks = 2
+        # num_joints = 2
         # add agents
         world.agents = [Robot() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):
@@ -39,7 +40,7 @@ class Scenario(BaseScenario):
     def reset_world(self, world):
         # properties for multiple agents evenly spaced on a circle
         radius_agent = 0.5
-        angle = 2*math.pi / len(world.agents)
+        angle = 2 * math.pi / len(world.agents)
         num_joints = 2
         resolution = 180
         # random properties for agents

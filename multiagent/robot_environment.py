@@ -98,6 +98,7 @@ class MultiAgentEnv(gym.Env):
 
         # all agents get total reward in cooperative case
         reward = np.sum(reward_n)
+        print('Reward is= ', reward)
         if self.shared_reward:
             reward_n = [reward] * self.n
 
@@ -173,6 +174,7 @@ class MultiAgentEnv(gym.Env):
                 if self.discrete_action_space:
                     agent.action.u[0] += action[0][1] - action[0][2]
                     agent.action.u[1] += action[0][3] - action[0][4]
+                    # action for grasping an object
                     agent.state.grasp = action[0][5] == 1.0
                 else:
                     agent.action.u = action[0]
@@ -279,7 +281,7 @@ class MultiAgentEnv(gym.Env):
                     dx.append(np.array([x,y]))
         return dx
 
-
+    # TODO: maak deze functies netter of plaats ergens anders
     def create_object_points(self, entity):
         pos = entity.state.p_pos
         size = 0.025

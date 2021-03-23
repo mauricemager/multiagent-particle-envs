@@ -41,11 +41,11 @@ class Robot(Agent):
         # give the position of the end effector
         return self.create_robot_points()[-1]
 
-    def test_object_graspable(self, object):
+    def within_reach(self, object):
         # test whether and object is within grasping range for a robot
         grasp_range = 0.05
-        end_pos = self.position_end_effector()
-        obj_pos = object.state.p_pos
+        end_pos = np.array(self.position_end_effector())
+        obj_pos = np.array(object.state.p_pos)
         dist = np.linalg.norm(obj_pos - end_pos)
         return dist <= grasp_range
 
@@ -54,17 +54,24 @@ class Roboworld(World):
         super(Roboworld, self).__init__()
         # define arm length of robots
         self.arm_length = 10
+        # joint per robot
+        self.num_joints = 2
 
     def step(self):
         for agent in self.agents:
             self.update_agent_state(agent)
+            self.update_object_state(agent, self.landmarks[0])
 
     def update_agent_state(self, agent):
         # print('State = ', agent.state.pos)
         # print('Action = ', agent.action.u)
         # print('length of pos vector', len(agent.state.pos))
-        for i in range(2):
+        for i in range(len(agent.state.pos)): # 2 when agent has 2 joints
             agent.state.pos[i] += agent.action.u[i]
             # make sure state stays within resolution
             agent.state.pos[i] %= agent.state.res
             # print(agent.state.pos[i])
+
+    def update_object_state(self, agent, object):
+        if (agent.within_reach(object) == True) and (agent.state.grasp == True):
+            object.state.p_pos = agent.position_end_effector()
