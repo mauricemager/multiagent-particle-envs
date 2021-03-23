@@ -53,9 +53,18 @@ class Roboworld(World):
     def __init__(self):
         super(Roboworld, self).__init__()
         # define arm length of robots
-        self.arm_length = 10
+        self.arm_length = 0.25
         # joint per robot
         self.num_joints = 2
+        #
+        self.goals = []
+        #
+        self.resolution = 8
+
+    @property
+    def entities(self):
+        return self.agents + self.landmarks + self.goals
+
 
     def step(self):
         for agent in self.agents:
@@ -75,3 +84,11 @@ class Roboworld(World):
     def update_object_state(self, agent, object):
         if (agent.within_reach(object) == True) and (agent.state.grasp == True):
             object.state.p_pos = agent.position_end_effector()
+
+    def robot_position(self, n, r=0.5):
+        if n == 1:
+            return [0, 0]
+        else:
+            phi = 2 * math.pi / n
+            return [[r * math.cos(phi * i + math.pi),
+                     r * math.sin(phi * i + math.pi)] for i in range(n)]
