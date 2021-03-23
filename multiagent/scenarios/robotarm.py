@@ -1,7 +1,6 @@
 import numpy as np
-import math
 from multiagent.robot import Robot, Roboworld
-from multiagent.core import Landmark, Entity
+from multiagent.core import Landmark
 from multiagent.scenario import BaseScenario
 
 class Scenario(BaseScenario):
