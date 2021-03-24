@@ -37,6 +37,24 @@ class Robot(Agent):
             points.append([sum(x) for x in zip(points[i], joint_coordinates)])
         return points
 
+    def create_gripper_points(self, gripped = False):
+        # TODO: np.array points should be filled in with legal gripper points,
+        #  all points rotated around axis with angle and then translated with agent.state.p_pos
+        #  should also be changed when gripped by self.state.gripped
+        radius = 0.05
+        res = 30
+        phi = math.pi / 3
+        points = np.empty([res, 2])
+        angle = 2 * math.pi * self.state.pos.cumsum() / self.state.res
+        if gripped:
+            radius *= 0.8
+            phi /= 3
+        for i in range(res):
+            ang = 2 * math.pi * i / res
+            if (ang >= 0.5 * phi) and (ang <= 2 * math.pi - 0.5 * phi):
+                # TODO: hierin gewoon de angle toevoegen
+                np.append((math.cos(ang) * radius, math.sin(ang) * radius))
+
     def position_end_effector(self):
         # give the position of the end effector
         return np.array(self.create_robot_points()[-1])

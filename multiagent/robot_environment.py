@@ -241,7 +241,18 @@ class MultiAgentEnv(gym.Env):
                     geom = rendering.make_polyline(entity.create_robot_points())
                     geom.set_color(*entity.color, alpha=0.5)
                     geom.set_linewidth(5)
+                    gripper = rendering.make_gripper_points(gripped=True)
+                    gripper.set_color(*entity.color, alpha=0.5)
+                    gripper.set_linewidth(5)
+
+                    xform = rendering.Transform()#.set_translation(0.1,0.1)
+                    gripper.add_attr(xform)
                     self.render_geoms.append(geom)
+
+                    self.render_geoms.append(gripper)
+                    # self.render_geoms_xform.append(xform)
+                    # print(self.render_geoms)
+                    print(self.render_geoms_xform)
                 elif 'object' in entity.name:
                     geom = rendering.make_polygon(self.create_object_points(entity))
                     geom.set_color(*entity.color)
@@ -252,6 +263,7 @@ class MultiAgentEnv(gym.Env):
 
             for viewer in self.viewers:
                 viewer.geoms = []
+                print(self.render_geoms)
                 for geom in self.render_geoms:
                     viewer.add_geom(geom)
 
