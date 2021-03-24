@@ -39,7 +39,7 @@ class Robot(Agent):
 
     def position_end_effector(self):
         # give the position of the end effector
-        return self.create_robot_points()[-1]
+        return np.array(self.create_robot_points()[-1])
 
     def within_reach(self, object):
         # test whether and object is within grasping range for a robot
@@ -53,23 +53,23 @@ class Roboworld(World):
     def __init__(self):
         super(Roboworld, self).__init__()
         # define arm length of robots
-        self.arm_length = 0.25
+        self.arm_length = 0.35
         # joint per robot
         self.num_joints = 2
         #
         self.goals = []
         #
-        self.resolution = 8
+        self.resolution = 180
 
     @property
     def entities(self):
-        return self.agents + self.landmarks + self.goals
+        return self.agents + self.objects + self.goals
 
 
     def step(self):
         for agent in self.agents:
             self.update_agent_state(agent)
-            self.update_object_state(agent, self.landmarks[0])
+            self.update_object_state(agent, self.objects[0])
 
     def update_agent_state(self, agent):
         # print('State = ', agent.state.pos)
@@ -87,8 +87,9 @@ class Roboworld(World):
 
     def robot_position(self, n, r=0.5):
         if n == 1:
-            return [0, 0]
+            return [[0, 0]]
         else:
             phi = 2 * math.pi / n
-            return [[r * math.cos(phi * i + math.pi),
-                     r * math.sin(phi * i + math.pi)] for i in range(n)]
+            position = [[r * math.cos(phi * i + math.pi),
+                        r * math.sin(phi * i + math.pi)] for i in range(n)]
+            return position
