@@ -9,6 +9,12 @@ from multiagent.robot_policy import RobotInteractivePolicy
 from multiagent.policy import InteractivePolicy
 import multiagent.scenarios as scenarios
 
+import torch as T
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+import numpy as np
+
 """
 ################################# TASKS #################################
 * make rendering possible for 2 arms 
@@ -45,10 +51,5 @@ if __name__ == '__main__':
         # display rewards
         # for agent in env.world.agents:
         #    print(agent.name + " reward: %0.3f" % env._get_reward(agent))
-        # print('End effector position test: ', world.agents[1].position_end_effector())
-        #
-        # print('You can grab to object: ', world.agents[1].within_reach(world.landmarks[0]))
-        #
-        # print('Agent is grabbing:', world.agents[1].state.grasp)
-        # print(re)
-        # print('Position')
+
+
