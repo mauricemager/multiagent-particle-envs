@@ -238,10 +238,10 @@ class MultiAgentEnv(gym.Env):
             for e, entity in enumerate(self.world.entities):
                 # self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
                 if 'agent' in entity.name:
-                    geom = rendering.make_polyline(entity.create_robot_points())
+                    geom = rendering.make_polyline(entity.create_robot_points(shorter_end=True))
                     geom.set_color(*entity.color, alpha=0.5)
                     geom.set_linewidth(5)
-                    gripper = rendering.make_gripper_points(gripped=True)
+                    gripper = rendering.make_polyline(entity.create_gripper_points(gripped=entity.state.grasp))
                     gripper.set_color(*entity.color, alpha=0.5)
                     gripper.set_linewidth(5)
 

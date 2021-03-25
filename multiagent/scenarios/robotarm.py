@@ -6,7 +6,7 @@ from multiagent.scenario import BaseScenario
 class Scenario(BaseScenario):
     def make_world(self):
         # define scenario properties
-        num_agents = 1
+        num_agents = 2
         num_objects = 1
         # create world
         world = Roboworld()

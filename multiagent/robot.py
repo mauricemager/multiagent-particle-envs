@@ -14,8 +14,6 @@ class RobotState(AgentState):
         # robot is grasping something
         self.grasp = False
 
-        # # width of robot arm
-        # self.width = None
 
 class Robot(Agent):
     def __init__(self):
@@ -23,7 +21,7 @@ class Robot(Agent):
         # robot state
         self.state = RobotState()
 
-    def create_robot_points(self):
+    def create_robot_points(self, shorter_end=False):
         # returns a vector of the joint locations of a multiple joint robot arm
         points = [self.state.p_pos]
         lengths = self.state.lengths
@@ -32,36 +30,44 @@ class Robot(Agent):
         # resolution dependent step for rendering
         step = 2 * math.pi / self.state.res
         for i in range(len(cum_state)):
-            joint_coordinates = [math.cos(step * cum_state[i]) * lengths[i],
-                                 math.sin(step * cum_state[i]) * lengths[i]]
+            length = lengths[i]
+            # remove part of last arm for better rendering with gripper
+            if shorter_end and (i == range(len(cum_state))[-1]):
+                length -= 0.045
+            # joint coordinates per segment
+            joint_coordinates = [math.cos(step * cum_state[i]) * length,
+                                 math.sin(step * cum_state[i]) * length]
+            # add the joint coordinates to the points vector
             points.append([sum(x) for x in zip(points[i], joint_coordinates)])
         return points
 
-    def create_gripper_points(self, gripped = False):
-        # TODO: np.array points should be filled in with legal gripper points,
-        #  all points rotated around axis with angle and then translated with agent.state.p_pos
-        #  should also be changed when gripped by self.state.gripped
-        radius = 0.05
-        res = 30
+    def create_gripper_points(self, radius = 0.05, res = 30, gripped = False):
+        # return a vector of the gripper points for rendering
+        # angle of gripper clearance
         phi = math.pi / 3
-        points = np.empty([res, 2])
-        angle = 2 * math.pi * self.state.pos.cumsum() / self.state.res
+        points = list()
+        # orientation of the gripper w.r.t. end effector
+        orientation = 2 * math.pi * np.sum(self.state.pos) / self.state.res
+        # smaller gripper and clearance when gripped
         if gripped:
             radius *= 0.8
             phi /= 3
+        # create the gripper points relative to end effector orientation
         for i in range(res):
             ang = 2 * math.pi * i / res
             if (ang >= 0.5 * phi) and (ang <= 2 * math.pi - 0.5 * phi):
-                # TODO: hierin gewoon de angle toevoegen
-                np.append((math.cos(ang) * radius, math.sin(ang) * radius))
+                points.append([math.cos(ang + orientation) * radius,
+                               math.sin(ang + orientation) * radius])
+        # translate gripped points to end effector location
+        points = np.array(points) + [self.position_end_effector()]
+        return points
 
     def position_end_effector(self):
         # give the position of the end effector
         return np.array(self.create_robot_points()[-1])
 
-    def within_reach(self, object):
+    def within_reach(self, object, grasp_range = 0.05):
         # test whether and object is within grasping range for a robot
-        grasp_range = 0.05
         end_pos = np.array(self.position_end_effector())
         obj_pos = np.array(object.state.p_pos)
         dist = np.linalg.norm(obj_pos - end_pos)
