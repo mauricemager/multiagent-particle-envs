@@ -2,6 +2,7 @@ from multiagent.core import AgentState, Agent, World
 import math
 import numpy as np
 
+
 class RobotState(AgentState):
     def __init__(self):
         super(RobotState, self).__init__()
@@ -41,7 +42,7 @@ class Robot(Agent):
             points.append([sum(x) for x in zip(points[i], joint_coordinates)])
         return points
 
-    def create_gripper_points(self, radius = 0.05, res = 30, gripped = False):
+    def create_gripper_points(self, radius=0.05, res=30, gripped=False):
         # return a vector of the gripper points for rendering
         # angle of gripper clearance
         phi = math.pi / 3
@@ -66,12 +67,13 @@ class Robot(Agent):
         # give the position of the end effector
         return np.array(self.create_robot_points()[-1])
 
-    def within_reach(self, object, grasp_range = 0.05):
+    def within_reach(self, object, grasp_range=0.05):
         # test whether and object is within grasping range for a robot
         end_pos = np.array(self.position_end_effector())
         obj_pos = np.array(object.state.p_pos)
         dist = np.linalg.norm(obj_pos - end_pos)
         return dist <= grasp_range
+
 
 class Roboworld(World):
     def __init__(self):
@@ -89,7 +91,6 @@ class Roboworld(World):
     def entities(self):
         return self.agents + self.objects + self.goals
 
-
     def step(self):
         for agent in self.agents:
             self.update_agent_state(agent)
@@ -99,7 +100,7 @@ class Roboworld(World):
         # print('State = ', agent.state.pos)
         # print('Action = ', agent.action.u)
         # print('length of pos vector', len(agent.state.pos))
-        for i in range(len(agent.state.pos)): # 2 when agent has 2 joints
+        for i in range(len(agent.state.pos)):  # 2 when agent has 2 joints
             agent.state.pos[i] += agent.action.u[i]
             # make sure state stays within resolution
             agent.state.pos[i] %= agent.state.res
@@ -115,5 +116,5 @@ class Roboworld(World):
         else:
             phi = 2 * math.pi / n
             position = [[r * math.cos(phi * i + math.pi),
-                        r * math.sin(phi * i + math.pi)] for i in range(n)]
+                         r * math.sin(phi * i + math.pi)] for i in range(n)]
             return position

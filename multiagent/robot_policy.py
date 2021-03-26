@@ -1,11 +1,29 @@
-from multiagent.policy import *
+import numpy as np
+from pyglet.window import key
+
+
+# individual agent policy
+class Policy(object):
+    def __init__(self):
+        pass
+
+    def action(self, obs):
+        raise NotImplementedError()
+
 
 # interactive policy based on keyboard input
 # hard-coded to deal only with movement, not communication
-class RobotInteractivePolicy(InteractivePolicy):
+class RobotPolicy(Policy):
     def __init__(self, env, agent_index):
-        super(RobotInteractivePolicy, self).__init__(env, agent_index)
-        self.grasp = env.world.agents[0].state.grasp
+        # super(RobotInteractivePolicy, self).__init__(env, agent_index)
+        super(RobotPolicy, self).__init__()
+        self.env = env
+        # hard-coded keyboard events
+        self.move = [False for i in range(5)]
+        self.comm = [False for i in range(env.world.dim_c)]
+        # register keyboard events with this environment's window
+        env.viewers[0].window.on_key_press = self.key_press
+        env.viewers[0].window.on_key_release = self.key_release
 
     def action(self, obs):
         # ignore observation and just act based on keyboard events
@@ -16,7 +34,7 @@ class RobotInteractivePolicy(InteractivePolicy):
             if self.move[2]: u = 4
             if self.move[3]: u = 3
         else:
-            u = np.zeros(6) # 5-d because of no-move action
+            u = np.zeros(6)  # 6-d because of no-move action
             if self.move[0]: u[1] += 1.0
             if self.move[1]: u[2] += 1.0
             if self.move[3]: u[3] += 1.0
@@ -27,15 +45,15 @@ class RobotInteractivePolicy(InteractivePolicy):
         return np.concatenate([u, np.zeros(self.env.world.dim_c)])
 
     def key_press(self, k, mod):
-        if k==key.LEFT:  self.move[0] = True
-        if k==key.RIGHT: self.move[1] = True
-        if k==key.UP:    self.move[2] = True
-        if k==key.DOWN:  self.move[3] = True
-        if k==key.SPACE: self.move[4] = True
+        if k == key.LEFT:  self.move[0] = True
+        if k == key.RIGHT: self.move[1] = True
+        if k == key.UP:    self.move[2] = True
+        if k == key.DOWN:  self.move[3] = True
+        if k == key.SPACE: self.move[4] = True
 
     def key_release(self, k, mod):
-        if k==key.LEFT:  self.move[0] = False
-        if k==key.RIGHT: self.move[1] = False
-        if k==key.UP:    self.move[2] = False
-        if k==key.DOWN:  self.move[3] = False
-        if k==key.SPACE: self.move[4] = False
+        if k == key.LEFT:  self.move[0] = False
+        if k == key.RIGHT: self.move[1] = False
+        if k == key.UP:    self.move[2] = False
+        if k == key.DOWN:  self.move[3] = False
+        if k == key.SPACE: self.move[4] = False

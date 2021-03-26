@@ -5,7 +5,7 @@ sys.path.insert(1, os.path.join(sys.path[0], '..'))
 import argparse
 
 from multiagent.robot_environment import MultiAgentEnv
-from multiagent.robot_policy import RobotInteractivePolicy
+from multiagent.robot_policy import RobotPolicy
 from multiagent.policy import InteractivePolicy
 import multiagent.scenarios as scenarios
 
@@ -35,17 +35,22 @@ if __name__ == '__main__':
     # render call to create viewer window (necessary only for interactive policies)
     env.render()
     # create interactive policies for each agent
-    policies = [RobotInteractivePolicy(env, i) for i in range(env.n)]
+    policies = [RobotPolicy(env, i) for i in range(env.n)]
+    # print(policies)
     # execution loop
     obs_n = env.reset()
     while True:
         # query for action from each agent's policy
         act_n = []
         for i, policy in enumerate(policies):
+            print(i, policy)
             act_n.append(policy.action(obs_n[i]))
+        print("act_n", act_n)
+        # act_n.append(policies[0].action(obs_n[0]))
         # step environment
         # print("act_n", act_n)
         obs_n, reward_n, done_n, _ = env.step(act_n)
+        print("obs_n: ", obs_n)
         # render all agent views
         env.render()
         # display rewards
