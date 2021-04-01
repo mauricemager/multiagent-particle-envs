@@ -6,7 +6,7 @@ from multiagent.scenario import BaseScenario
 class Scenario(BaseScenario):
     def make_world(self):
         # define scenario properties
-        num_agents = 2
+        num_agents = 1
         num_objects = 1
         # create world
         world = Roboworld()
@@ -69,7 +69,9 @@ class Scenario(BaseScenario):
         for entity in world.objects:
             dist = np.sum(np.square(entity.state.p_pos - agent.position_end_effector()))
             entity_pos = np.append(entity_pos, dist)
-        obs = [[agent.state.pos], [entity_pos], [agent.state.grasp]]
+        # obs = [agent.state.pos.tolist(), entity_pos.tolist(), agent.state.grasp]
+        obs = np.concatenate((agent.state.pos.astype(float), entity_pos.astype(float), np.array([agent.state.grasp]).astype(float)))
+        print(obs)
         return obs
 
 

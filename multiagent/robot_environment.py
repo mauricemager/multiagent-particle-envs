@@ -155,6 +155,7 @@ class MultiAgentEnv(gym.Env):
                 index += s
             action = act
         else:
+            print('test', action)
             action = [action]
 
         if agent.movable:
@@ -175,8 +176,9 @@ class MultiAgentEnv(gym.Env):
                     agent.action.u[0] += action[0][1] - action[0][2]
                     agent.action.u[1] += action[0][3] - action[0][4]
                     # action for grasping an object
+                    print('action', action[0])
                     agent.state.grasp = action[0][5] == 1.0
-                    print('action', action)
+
                 else:
                     agent.action.u = action[0]
             sensitivity = 1.0
