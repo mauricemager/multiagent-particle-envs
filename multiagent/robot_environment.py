@@ -43,7 +43,7 @@ class MultiAgentEnv(gym.Env):
             total_action_space = []
             # physical action space
             if self.discrete_action_space:
-                u_action_space = spaces.Discrete(world.dim_p * 2 + 1) # changed to + 2
+                u_action_space = spaces.Discrete(world.dim_p * 2 + 2) # changed to + 2
             else:
                 u_action_space = spaces.Box(low=-agent.u_range, high=+agent.u_range, shape=(world.dim_p,), dtype=np.float32)
             if agent.movable:
@@ -176,7 +176,7 @@ class MultiAgentEnv(gym.Env):
                     agent.action.u[0] += action[0][1] - action[0][2]
                     agent.action.u[1] += action[0][3] - action[0][4]
                     # action for grasping an object
-                    print('action', action[0])
+                    # print('action', action[0])
                     agent.state.grasp = action[0][5] == 1.0
 
                 else:
