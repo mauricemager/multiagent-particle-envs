@@ -77,6 +77,7 @@ class MADDPG(object):
         Outputs:
             actions: List of actions for each agent
         """
+        print("observations", observations)
         return [a.step(obs, explore=explore) for a, obs in zip(self.agents,
                                                                  observations)]
 

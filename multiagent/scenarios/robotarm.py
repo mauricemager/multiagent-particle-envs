@@ -39,7 +39,6 @@ class Scenario(BaseScenario):
     def reset_world(self, world):
         # set agent properties
         origins = world.robot_position(len(world.agents))
-        print(origins)
         for i, agent in enumerate(world.agents):
             agent.color = np.array([0.25,0.25,0.25])
             agent.state.lengths = world.arm_length * np.ones(world.num_joints)
@@ -71,7 +70,6 @@ class Scenario(BaseScenario):
             entity_pos = np.append(entity_pos, dist)
         # obs = [agent.state.pos.tolist(), entity_pos.tolist(), agent.state.grasp]
         obs = np.concatenate((agent.state.pos.astype(float), entity_pos.astype(float), np.array([agent.state.grasp]).astype(float)))
-        print(obs)
         return obs
 
 
