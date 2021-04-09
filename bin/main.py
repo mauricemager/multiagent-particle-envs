@@ -43,7 +43,7 @@ if __name__ == '__main__':
         # query for action from each agent's policy
         act_n = []
         for i, policy in enumerate(policies):
-            print(i, policy)
+            # print(i, policy)
             act_n.append(policy.action(obs_n[i]))
         print("act_n", act_n)
         # act_n.append(policies[0].action(obs_n[0]))

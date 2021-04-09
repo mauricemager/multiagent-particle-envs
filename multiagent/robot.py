@@ -101,7 +101,8 @@ class Roboworld(World):
             agent.state.pos[i] += agent.action.u[i]
             # make sure state stays within resolution
             agent.state.pos[i] %= agent.state.res
-            # print(agent.state.pos[i])
+        # activate gripper when last action element == 1.0
+        agent.state.grasp = agent.action.u[-1] == 1.0
 
     def update_object_state(self, agent, object):
         if (agent.within_reach(object) == True) and (agent.state.grasp == True):

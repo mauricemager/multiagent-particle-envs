@@ -29,7 +29,7 @@ class MultiAgentEnv(gym.Env):
         # environment parameters
         self.discrete_action_space = True
         # if true, action is a number 0...N, otherwise action is a one-hot N-dimensional vector
-        self.discrete_action_input = True
+        self.discrete_action_input = False
         # if true, even the action is continuous, action will be performed discretely
         self.force_discrete_action = world.discrete_action if hasattr(world, 'discrete_action') else False
         # if true, every agent has the same reward
@@ -98,7 +98,7 @@ class MultiAgentEnv(gym.Env):
 
         # all agents get total reward in cooperative case
         reward = np.sum(reward_n)
-        print('Reward is= ', reward)
+        # print('Reward is= ', reward)
         if self.shared_reward:
             reward_n = [reward] * self.n
         return obs_n, reward_n, done_n, info_n
@@ -142,7 +142,9 @@ class MultiAgentEnv(gym.Env):
 
     # set env action for a particular agent
     def _set_action(self, action, agent, action_space, time=None):
-        agent.action.u = np.zeros(self.world.dim_p)
+        # add plus length 1 for grasping action
+        agent.action.u = np.zeros(self.world.dim_p + 1)
+        # agent.action.u = [] * (self.world.dim_p + 1)
         agent.action.c = np.zeros(self.world.dim_c)
         # process action
         if isinstance(action_space, MultiDiscrete):
@@ -154,7 +156,8 @@ class MultiAgentEnv(gym.Env):
                 index += s
             action = act
         else:
-            print(f'Sample of action vector: {action}')
+            # print(f'Sample of action vector: {action}')
+            # TODO: hier komt dubbele list vandaan ???
             action = [action]
 
         if agent.movable:
@@ -162,10 +165,12 @@ class MultiAgentEnv(gym.Env):
             if self.discrete_action_input:
                 agent.action.u = np.zeros(self.world.dim_p)
                 # process discrete action
-                if action[0] == 1: agent.action.u[0] = -1.0
-                if action[0] == 2: agent.action.u[0] = +1.0
-                if action[0] == 3: agent.action.u[1] = -1.0
-                if action[0] == 4: agent.action.u[1] = +1.0
+                print(f"action {action[0]}")
+                if action[0][1] == 1: agent.action.u[0] = +1.0
+                if action[0][2] == 1: agent.action.u[0] = -1.0
+                if action[0][3] == 1: agent.action.u[1] = +1.0
+                if action[0][4] == 1: agent.action.u[1] = -1.0
+                agent.state.grasp = action[0][5] == 1.0
             else:
                 if self.force_discrete_action:
                     d = np.argmax(action[0])
@@ -174,9 +179,12 @@ class MultiAgentEnv(gym.Env):
                 if self.discrete_action_space:
                     agent.action.u[0] += action[0][1] - action[0][2]
                     agent.action.u[1] += action[0][3] - action[0][4]
+                    agent.action.u[-1] = action[0][5]
                     # action for grasping an object
                     # print('action', action[0])
-                    agent.state.grasp = action[0][5] == 1.0
+
+                    print(f"agent.action.u = {agent.action.u}")
+                    # agent.state.grasp = action[0][5] == 1.0
 
                 else:
                     agent.action.u = action[0]
